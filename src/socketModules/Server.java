@@ -92,31 +92,32 @@ public class Server {
 	public static void main(String[] args) {
 		try {
 			String menu = "";
-			byte[] receiveData = new byte[1024];
-			byte[] sendData = new byte[1024];
 			int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "2025"));
 			DatagramSocket server = new DatagramSocket(port);
 			System.out.println("Pham Thanh Hieu: Server has started on port: " + port);
 			int choice = -1;
 			while (true) {
 				try {
+					byte[] receiveData = new byte[1024];
+					byte[] sendData = new byte[1024];
 					menu = PrintMenu();
 					// Wait for client to connect
 					DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 					server.receive(receivePacket);
 					String clientMessage = new String(receivePacket.getData());
-					System.out.println(clientMessage);
+//					System.out.println(clientMessage);
 					// Get client InetAddress and Port
 					InetAddress clientInet = receivePacket.getAddress();
 					int clientPort = receivePacket.getPort();
-					System.out.println("ClientPOrt: " + clientPort);
+//					System.out.println("ClientPOrt: " + clientPort);
 					// Send menu to client
 					sendData = menu.getBytes();
 					DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientInet, clientPort);
 					server.send(sendPacket);
 					// Read choice from client
+					receivePacket.setLength(receiveData.length);
 					server.receive(receivePacket);
-					choice = Integer.valueOf(BytesStringConverter.bytesToString(receivePacket));
+					choice = Integer.valueOf(new String(receivePacket.getData(), 0, receivePacket.getLength()));
 					if (choice == 0) {
 						System.out.println("Client disconnected.");
 						break; // Exit the loop when client exits
@@ -128,11 +129,11 @@ public class Server {
 					server.send(sendPacket);
 					// Read input here
 					server.receive(receivePacket);
-					String input = new String(receivePacket.getData());
+					String input = new String(receivePacket.getData(), 0, receivePacket.getLength());
 					String input2 = "";
 					if (choice == 3) {
 						server.receive(receivePacket);
-						input2 = new String(receivePacket.getData());
+						input2 = new String(receivePacket.getData(), 0, receivePacket.getLength());
 					}
 					String result = ThucHienBaiTap(choice, input, input2);
 					sendData = result.getBytes();

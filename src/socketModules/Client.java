@@ -27,14 +27,14 @@ public class Client {
 			while (true) {
 				try {
 					// Send a connection message to server
-					String message = "Hello, a new client has connected!";
+					String message = "Hello, a new client has made a request";
 					sendData = message.getBytes();
 					DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address, serverPort);
 					client.send(sendPacket);
 					// Read menu from server
 					DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 					client.receive(receivePacket);
-					menu = new String(receivePacket.getData());
+					menu = new String(receivePacket.getData(), 0, receivePacket.getLength());
 					System.out.println(menu);
 					// Input choice
 					chonBaiTap = sc.nextInt();
@@ -45,7 +45,7 @@ public class Client {
 					client.send(sendPacket);
 					// Get ex prompt
 					client.receive(receivePacket);
-					ex_prompt = new String(receivePacket.getData());
+					ex_prompt = new String(receivePacket.getData(), 0, receivePacket.getLength());
 					System.out.println(ex_prompt);
 					// Insert answer accordingly
 					input = sc.nextLine();
@@ -67,13 +67,13 @@ public class Client {
 					}
 					// get server response
 					client.receive(receivePacket);
-					String response = BytesStringConverter.bytesToString(receivePacket);
+					String response = new String(receivePacket.getData(), 0, receivePacket.getLength());
 					System.out.println(response);
 
 				} catch (Exception e) {
 					System.out.println("End program client!");
 					e.printStackTrace();
-					break;
+//					break;
 				}
 			}
 		} catch (IOException e) {
